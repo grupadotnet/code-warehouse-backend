@@ -1,10 +1,7 @@
 name: CI
 
 on:
-  push:
-  pull_request:
-    branches:
-      - main
+  - push
 
 env:
   JDK_VERSION: '17'
