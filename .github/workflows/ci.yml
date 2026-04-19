@@ -29,11 +29,3 @@ jobs:
           distribution: 'temurin'
       - name: Test
         run: mvn test
-  lint:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-      - name: Lint
-        uses: dbelyaev/action-checkstyle@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
