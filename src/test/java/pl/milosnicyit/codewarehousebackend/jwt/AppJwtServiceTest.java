@@ -1,5 +1,6 @@
 package pl.milosnicyit.codewarehousebackend.jwt;
 
+import org.commons.login.UserId;
 import org.commons.login.Username;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +26,7 @@ class AppJwtServiceTest {
     void shouldDelegateGenerateToken() {
         try (MockedConstruction<JwtBasicService> mockedConstruction = Mockito.mockConstruction(JwtBasicService.class,
                 (mock, context) -> {
-                    when(mock.generateToken(any(Username.class))).thenReturn("mocked_token");
+                    when(mock.generateToken(any(UserId.class))).thenReturn("mocked_token");
                 })) {
 
             AppJwtService appJwtService = new AppJwtService(jwtSecretService);
@@ -45,12 +46,12 @@ class AppJwtServiceTest {
         // given
         try (MockedConstruction<JwtBasicService> mockedConstruction = Mockito.mockConstruction(JwtBasicService.class,
                 (mock, context) -> {
-                    when(mock.extractLogin("some_token")).thenReturn(new Username("extractedUser"));
+                    when(mock.extractUserId("some_token")).thenReturn(new UserId("extractedUser"));
                 })) {
 
             AppJwtService appJwtService = new AppJwtService(jwtSecretService);
 
-            String result = appJwtService.extractLogin("some_token");
+            String result = appJwtService.extractUserId("some_token");
 
             assertEquals("extractedUser", result);
         }

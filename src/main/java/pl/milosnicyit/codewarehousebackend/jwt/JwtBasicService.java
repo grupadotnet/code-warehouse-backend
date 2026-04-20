@@ -4,6 +4,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.NonNull;
+import org.commons.login.UserId;
 import org.commons.login.Username;
 import pl.milosnicyit.codewarehousebackend.jwt.secret.JWTSecretService;
 
@@ -18,16 +19,16 @@ class JwtBasicService {
         this.jwtSecretService = jwtSecretService;
     }
 
-    public String generateToken(@NonNull final Username username) {
+    public String generateToken(@NonNull final UserId userId) {
         return Jwts.builder()
-                .subject(username.toString())
+                .subject(userId.toString())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    public Username extractLogin(@NonNull final String token) {
+    public UserId extractUserId(@NonNull final String token) {
         final String subject = Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
@@ -35,7 +36,7 @@ class JwtBasicService {
                 .getPayload()
                 .getSubject();
 
-        return new Username(subject);
+        return new UserId(subject);
     }
 
     public boolean validateToken(@NonNull final String jwtToken) {

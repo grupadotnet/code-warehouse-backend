@@ -32,7 +32,7 @@ class UserAppService implements UsersService {
         userDTO.setPassword(this.passwordEncoderService.encode(password));
 
         if (this.userRepositoryWrapper.save(userDTO)) {
-            return this.jwtService.generateToken(username);
+            return this.jwtService.generateToken(userDTO.getId());
         }
         return null;
     }
