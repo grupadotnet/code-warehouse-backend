@@ -1,6 +1,7 @@
 package pl.milosnicyit.codewarehousebackend.users;
 
 import org.commons.login.Password;
+import pl.milosnicyit.codewarehousebackend.exeptions.UserAlreadyExistsException;
 import pl.milosnicyit.codewarehousebackend.jwt.JWTService;
 import pl.milosnicyit.codewarehousebackend.password.PasswordEncoderService;
 import pl.milosnicyit.codewarehousebackend.users.database.wrapper.UserDTO;
@@ -20,7 +21,7 @@ class UserAppService implements UsersService {
 
     public String registerUser(String username, String rawPassword) {
         if (userRepositoryWrapper.existsByUsername(username)) {
-            return null;
+            throw new UserAlreadyExistsException(username);
         }
 
         final Password password = new Password(rawPassword);

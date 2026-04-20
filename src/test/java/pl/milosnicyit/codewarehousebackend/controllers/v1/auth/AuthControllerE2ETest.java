@@ -52,8 +52,8 @@ class AuthControllerE2ETest {
         mockMvc.perform(post(REGISTER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").isEmpty());
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.error").isNotEmpty());
     }
 
     private String getUserRequestJson(String username, String password) throws JsonProcessingException {
