@@ -1,4 +1,4 @@
-package pl.milosnicyit.codewarehousebackend.location.adapter;
+package pl.milosnicyit.codewarehousebackend.location.database.wrapper;
 
 import org.springframework.stereotype.Repository;
 import pl.milosnicyit.codewarehousebackend.location.Location;
@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class LocationRepositoryAdapter implements LocationRepository {
+class LocationRepositoryWrapper implements LocationRepository {
 
     private final LocationJpaRepository jpaRepository;
 
-    public LocationRepositoryAdapter(LocationJpaRepository jpaRepository) {
+    public LocationRepositoryWrapper(LocationJpaRepository jpaRepository) {
         this.jpaRepository = jpaRepository;
     }
 

@@ -7,7 +7,7 @@ import pl.milosnicyit.codewarehousebackend.location.LocationService;
 import pl.milosnicyit.codewarehousebackend.location.LocationServiceImpl;
 
 @Configuration
-public class LocationConfiguration {
+class LocationConfiguration {
 
     @Bean
     public LocationService locationService(LocationRepository locationRepository) {

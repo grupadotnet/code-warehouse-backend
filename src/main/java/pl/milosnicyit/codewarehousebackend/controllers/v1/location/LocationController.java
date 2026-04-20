@@ -1,38 +1,40 @@
-package pl.milosnicyit.codewarehousebackend.location;
+package pl.milosnicyit.codewarehousebackend.controllers.v1.location;
 
 import java.util.List;
 
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.milosnicyit.codewarehousebackend.location.Location;
+import pl.milosnicyit.codewarehousebackend.location.LocationService;
 
 @RestController
 @RequestMapping("/api/locations")
-public class LocationController {
+class LocationController {
 
   private final LocationService locationService;
 
-  public LocationController(LocationService locationService) {
+  LocationController(LocationService locationService) {
     this.locationService = locationService;
   }
 
   @GetMapping
-  public ResponseEntity<List<Location>> getLocations() {
+  ResponseEntity<List<Location>> getLocations() {
     return ResponseEntity.ok(locationService.getAllLocations());
   }
   @PostMapping
-  public ResponseEntity<Location>
+  ResponseEntity<Location>
   createLocation(@RequestBody Location location) {
     return ResponseEntity.ok(locationService.createLocation(location));
   }
   @PatchMapping("/{id}")
-  public ResponseEntity<Location>
+  ResponseEntity<Location>
   updateLocation(@PathVariable Long id, @RequestBody @NonNull Location locationUpdate) {
     return ResponseEntity.ok(
         locationService.updateLocationName(id, locationUpdate.getName()));
   }
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteLocation(@PathVariable Long id) {
+  ResponseEntity<Void> deleteLocation(@PathVariable Long id) {
     locationService.deleteLocation(id);
     return ResponseEntity.noContent().build();
   }
