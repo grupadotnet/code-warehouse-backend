@@ -9,9 +9,9 @@ import lombok.Data;
 @Table(name = "users")
 public class UserEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "user_id", unique = true, nullable = false)
+    private String id;
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;

@@ -1,7 +1,7 @@
 package pl.milosnicyit.codewarehousebackend.jwt;
 
 import lombok.NonNull;
-import org.commons.login.Username;
+import org.commons.login.UserId;
 import pl.milosnicyit.codewarehousebackend.jwt.secret.JWTSecretService;
 
 class AppJwtService implements JWTService {
@@ -12,13 +12,13 @@ class AppJwtService implements JWTService {
     }
 
     @Override
-    public String generateToken(@NonNull String username) {
-        return this.jwtBasicService.generateToken(new Username(username));
+    public String generateToken(@NonNull String userId) {
+        return this.jwtBasicService.generateToken(new UserId(userId));
     }
 
     @Override
-    public String extractLogin(@NonNull String token) {
-        return this.jwtBasicService.extractLogin(token).toString();
+    public String extractUserId(@NonNull String token) {
+        return this.jwtBasicService.extractUserId(token).toString();
     }
 
     @Override

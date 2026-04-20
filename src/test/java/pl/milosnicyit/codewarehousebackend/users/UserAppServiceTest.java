@@ -54,11 +54,14 @@ class UserAppServiceTest {
         String rawPassword = "secretPasswodddddddddddddddddddddddd";
         String encodedPassword = "encodedPassword123";
         String expectedToken = "jwt.token.here";
+        String userId = "aaa";
 
         when(userRepositoryWrapper.existsByUsername(username)).thenReturn(false);
         when(passwordEncoderService.encode(any(Password.class))).thenReturn(encodedPassword);
         when(userRepositoryWrapper.save(any(UserDTO.class))).thenReturn(true);
-        when(jwtService.generateToken(username)).thenReturn(expectedToken);
+        when(userRepositoryWrapper.findByUsername(any(String.class))).thenReturn(new UserDTO(userId, username,
+                encodedPassword));
+        when(jwtService.generateToken(userId)).thenReturn(expectedToken);
 
         String result = userAppService.registerUser(username, rawPassword);
 
@@ -92,24 +95,26 @@ class UserAppServiceTest {
 
     @Test
     void shouldLoginUserAndReturnTokenWhenCredentialsAreCorrect() {
+        String userId = "ddddddd";
         String username = "existingUser";
         String rawPassword = "correctPassword123";
         String encodedPasswordInDb = "encodedHash";
         String expectedToken = "valid.jwt.token";
 
         UserDTO userDTO = new UserDTO();
+        userDTO.setId(userId);
         userDTO.setUsername(username);
         userDTO.setPassword(encodedPasswordInDb);
 
         when(userRepositoryWrapper.findByUsername(username)).thenReturn(userDTO);
         when(passwordEncoderService.matches(any(Password.class), eq(encodedPasswordInDb))).thenReturn(true);
-        when(jwtService.generateToken(username)).thenReturn(expectedToken);
+        when(jwtService.generateToken(userId)).thenReturn(expectedToken);
 
         String result = userAppService.loginUser(username, rawPassword);
 
         assertEquals(expectedToken, result);
         verify(passwordEncoderService).matches(any(Password.class), eq(encodedPasswordInDb));
-        verify(jwtService).generateToken(username);
+        verify(jwtService).generateToken(userId);
     }
 
     @Test

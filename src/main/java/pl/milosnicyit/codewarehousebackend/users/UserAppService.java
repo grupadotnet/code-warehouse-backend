@@ -32,7 +32,11 @@ class UserAppService implements UsersService {
         userDTO.setPassword(this.passwordEncoderService.encode(password));
 
         if (this.userRepositoryWrapper.save(userDTO)) {
-            return this.jwtService.generateToken(username);
+            UserDTO newUserDTO = this.userRepositoryWrapper.findByUsername(username);
+
+            if (newUserDTO != null) {
+                return this.jwtService.generateToken(newUserDTO.getId());
+            }
         }
         return null;
     }
@@ -44,6 +48,6 @@ class UserAppService implements UsersService {
             throw new BadCredentialsException("Bad credentials");
         }
 
-        return this.jwtService.generateToken(userDTO.getUsername());
+        return this.jwtService.generateToken(userDTO.getId());
     }
 }

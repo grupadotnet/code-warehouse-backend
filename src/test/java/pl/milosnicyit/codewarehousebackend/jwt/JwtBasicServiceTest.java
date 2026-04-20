@@ -1,5 +1,6 @@
 package pl.milosnicyit.codewarehousebackend.jwt;
 
+import org.commons.login.UserId;
 import org.commons.login.Username;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,10 +31,10 @@ class JwtBasicServiceTest {
 
     @Test
     void shouldGenerateValidToken() {
-        Username username = mock(Username.class);
-        when(username.toString()).thenReturn(TEST_USERNAME);
+        UserId userId = mock(UserId.class);
+        when(userId.toString()).thenReturn(TEST_USERNAME);
 
-        String token = jwtBasicService.generateToken(username);
+        String token = jwtBasicService.generateToken(userId);
 
         assertNotNull(token);
         assertFalse(token.isEmpty());
@@ -42,22 +43,22 @@ class JwtBasicServiceTest {
 
     @Test
     void shouldExtractLoginFromToken() {
-        Username mockUsername = mock(Username.class);
-        when(mockUsername.toString()).thenReturn(TEST_USERNAME);
+        UserId userId = mock(UserId.class);
+        when(userId.toString()).thenReturn(TEST_USERNAME);
 
-        String generatedToken = jwtBasicService.generateToken(mockUsername);
+        String generatedToken = jwtBasicService.generateToken(userId);
 
-        Username extractedUsername = jwtBasicService.extractLogin(generatedToken);
+        UserId extractedUserId = jwtBasicService.extractUserId(generatedToken);
 
-        assertNotNull(extractedUsername);
-        assertEquals(TEST_USERNAME, extractedUsername.toString());
+        assertNotNull(extractedUserId);
+        assertEquals(TEST_USERNAME, extractedUserId.toString());
     }
 
     @Test
     void shouldReturnTrueWhenTokenIsValid() {
-        Username mockUsername = mock(Username.class);
-        when(mockUsername.toString()).thenReturn(TEST_USERNAME);
-        String generatedToken = jwtBasicService.generateToken(mockUsername);
+        UserId userId = mock(UserId.class);
+        when(userId.toString()).thenReturn(TEST_USERNAME);
+        String generatedToken = jwtBasicService.generateToken(userId);
 
         boolean isValid = jwtBasicService.validateToken(generatedToken);
 
@@ -66,10 +67,9 @@ class JwtBasicServiceTest {
 
     @Test
     void shouldReturnFalseWhenTokenIsTampered() {
-        // given
-        Username mockUsername = mock(Username.class);
-        when(mockUsername.toString()).thenReturn(TEST_USERNAME);
-        String generatedToken = jwtBasicService.generateToken(mockUsername);
+        UserId userId = mock(UserId.class);
+        when(userId.toString()).thenReturn(TEST_USERNAME);
+        String generatedToken = jwtBasicService.generateToken(userId);
 
         String tamperedToken = generatedToken.substring(0, generatedToken.length() - 3) + "BAD";
 

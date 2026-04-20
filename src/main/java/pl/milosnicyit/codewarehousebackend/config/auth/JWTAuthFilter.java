@@ -34,9 +34,9 @@ public class JWTAuthFilter extends OncePerRequestFilter {
         if (authorization != null && authorization.startsWith("Bearer ")) {
             String token = authorization.substring(7);
             try {
-                String login = this.jwtService.extractLogin(token);
-                if (login != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = this.userDetailsService.loadUserByUsername(login);
+                String userId = this.jwtService.extractUserId(token);
+                if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = this.userDetailsService.loadUserByUsername(userId);
 
                     if (this.jwtService.validateToken(token)) {
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
