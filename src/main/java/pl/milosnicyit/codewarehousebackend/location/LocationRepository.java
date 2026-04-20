@@ -1,9 +1,12 @@
 package pl.milosnicyit.codewarehousebackend.location;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.Optional;
 
-@Repository
-public interface LocationRepository extends JpaRepository<Location, Long> {
+public interface LocationRepository {
+    List<Location> findAll();
+    Optional<Location> findById(Long id);
+    Optional<Location> findByName(String name);
+    Location save(Location location);
+    void deleteById(Long id);
 }
-
