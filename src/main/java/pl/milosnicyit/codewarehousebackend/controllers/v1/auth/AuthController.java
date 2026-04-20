@@ -35,4 +35,18 @@ public class AuthController {
         final String token = this.usersService.registerUser(userRequest.getUsername(), userRequest.getPassword());
         return ResponseEntity.ok(new TokenResponse(token));
     }
+
+    @PostMapping("/login")
+    @Operation(
+            summary = "Login user",
+            description = "Authenticates a user and returns a JWT token if credentials are valid."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully authenticated. Returns JWT token."),
+    })
+    public ResponseEntity<TokenResponse> login(@RequestBody UserRequest userRequest) {
+        final String token = this.usersService.loginUser(userRequest.getUsername(), userRequest.getPassword());
+        return ResponseEntity.ok(new TokenResponse(token));
+    }
+
 }

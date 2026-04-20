@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,7 +27,6 @@ class PasswordEncoderBasicServiceTest {
 
     @Test
     void shouldEncodePassword() {
-        // given
         String rawPasswordString = "mojeSuperHaslo123";
         String encodedPassword = "$2a$10$wypVjTq...ZaszyfrowaneHaslo";
 
@@ -35,17 +35,29 @@ class PasswordEncoderBasicServiceTest {
 
         when(passwordEncoder.encode(rawPasswordString)).thenReturn(encodedPassword);
 
-        // when
         String result = passwordEncoderService.encode(mockPassword);
 
-        // then
         assertEquals(encodedPassword, result);
         verify(passwordEncoder, times(1)).encode(rawPasswordString);
     }
 
     @Test
+    void shouldPasswordAreEqual() {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        PasswordEncoderService passwordEncoderService = new PasswordEncoderBasicService(passwordEncoder);
+
+        String rawPasswordString = "mojeSuperHaslo123";
+        Password password = new Password(rawPasswordString);
+        Password wrongPassword = new Password(rawPasswordString+"0");
+
+        String encodedPassword = passwordEncoderService.encode(password);
+
+        assertTrue(passwordEncoderService.matches(password, encodedPassword));
+        assertFalse(passwordEncoderService.matches(wrongPassword, encodedPassword));
+    }
+
+    @Test
     void shouldReturnTrueWhenPasswordsMatch() {
-        // given
         String rawPasswordString = "mojeSuperHaslo123";
         String encodedPasswordFromDb = "$2a$10$wypVjTq...ZaszyfrowaneHaslo";
 
@@ -56,14 +68,12 @@ class PasswordEncoderBasicServiceTest {
 
         boolean isMatch = passwordEncoderService.matches(mockPassword, encodedPasswordFromDb);
 
-        // then
         assertTrue(isMatch);
         verify(passwordEncoder, times(1)).matches(rawPasswordString, encodedPasswordFromDb);
     }
 
     @Test
     void shouldReturnFalseWhenPasswordsDoNotMatch() {
-        // given
         String rawPasswordString = "zleHaslo";
         String encodedPasswordFromDb = "$2a$10$wypVjTq...ZaszyfrowaneHaslo";
 
@@ -72,10 +82,8 @@ class PasswordEncoderBasicServiceTest {
 
         when(passwordEncoder.matches(rawPasswordString, encodedPasswordFromDb)).thenReturn(false);
 
-        // when
         boolean isMatch = passwordEncoderService.matches(mockPassword, encodedPasswordFromDb);
 
-        // then
         assertFalse(isMatch);
         verify(passwordEncoder, times(1)).matches(rawPasswordString, encodedPasswordFromDb);
     }
