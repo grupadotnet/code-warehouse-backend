@@ -7,6 +7,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.BadCredentialsException;
 import pl.milosnicyit.codewarehousebackend.exeptions.UserAlreadyExistsException;
 import pl.milosnicyit.codewarehousebackend.jwt.JWTService;
 import pl.milosnicyit.codewarehousebackend.password.PasswordEncoderService;
@@ -87,5 +88,54 @@ class UserAppServiceTest {
         assertNull(result, "Should return null if saving to DB fails");
 
         verify(jwtService, never()).generateToken(anyString());
+    }
+
+    @Test
+    void shouldLoginUserAndReturnTokenWhenCredentialsAreCorrect() {
+        String username = "existingUser";
+        String rawPassword = "correctPassword123";
+        String encodedPasswordInDb = "encodedHash";
+        String expectedToken = "valid.jwt.token";
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUsername(username);
+        userDTO.setPassword(encodedPasswordInDb);
+
+        when(userRepositoryWrapper.findByUsername(username)).thenReturn(userDTO);
+        when(passwordEncoderService.matches(any(Password.class), eq(encodedPasswordInDb))).thenReturn(true);
+        when(jwtService.generateToken(username)).thenReturn(expectedToken);
+
+        String result = userAppService.loginUser(username, rawPassword);
+
+        assertEquals(expectedToken, result);
+        verify(passwordEncoderService).matches(any(Password.class), eq(encodedPasswordInDb));
+        verify(jwtService).generateToken(username);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenPasswordDoesNotMatch() {
+        String username = "existingUser";
+        String rawPassword = "wrongPasswosssssssssssssssssssssrd";
+        String encodedPasswordInDb = "encssssssssssssodedHash";
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUsername(username);
+        userDTO.setPassword(encodedPasswordInDb);
+
+        when(userRepositoryWrapper.findByUsername(username)).thenReturn(userDTO);
+        when(passwordEncoderService.matches(any(Password.class), eq(encodedPasswordInDb))).thenReturn(false);
+
+        assertThrows(
+                BadCredentialsException.class,
+                () -> userAppService.loginUser(username, rawPassword)
+        );
+
+        verify(jwtService, never()).generateToken(anyString());
+    }
+
+    @Test
+    void shouldThrowNullPointerExceptionWhenLoginArgumentsAreNull() {
+        assertThrows(NullPointerException.class, () -> userAppService.loginUser(null, "pass"));
+        assertThrows(NullPointerException.class, () -> userAppService.loginUser("user", null));
     }
 }

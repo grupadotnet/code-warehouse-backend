@@ -1,6 +1,8 @@
 package pl.milosnicyit.codewarehousebackend.users;
 
+import lombok.NonNull;
 import org.commons.login.Password;
+import org.springframework.security.authentication.BadCredentialsException;
 import pl.milosnicyit.codewarehousebackend.exeptions.UserAlreadyExistsException;
 import pl.milosnicyit.codewarehousebackend.jwt.JWTService;
 import pl.milosnicyit.codewarehousebackend.password.PasswordEncoderService;
@@ -19,7 +21,7 @@ class UserAppService implements UsersService {
         this.jwtService = jwtService;
     }
 
-    public String registerUser(String username, String rawPassword) {
+    public String registerUser(@NonNull final String username, @NonNull final String rawPassword) {
         if (userRepositoryWrapper.existsByUsername(username)) {
             throw new UserAlreadyExistsException(username);
         }
@@ -33,5 +35,15 @@ class UserAppService implements UsersService {
             return this.jwtService.generateToken(username);
         }
         return null;
+    }
+
+    public String loginUser(@NonNull final String username, @NonNull final String rawPassword) {
+        final Password password = new Password(rawPassword);
+        final UserDTO userDTO = this.userRepositoryWrapper.findByUsername(username);
+        if (!this.passwordEncoderService.matches(password, userDTO.getPassword())) {
+            throw new BadCredentialsException("Bad credentials");
+        }
+
+        return this.jwtService.generateToken(userDTO.getUsername());
     }
 }

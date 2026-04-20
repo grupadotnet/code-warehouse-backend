@@ -22,6 +22,7 @@ import static pl.milosnicyit.codewarehousebackend.helpers.JsonHelper.toJson;
 @AutoConfigureMockMvc(addFilters = false)
 class AuthSpecificationTest {
     private static final String REGISTER_ENDPOINT = PATH + "auth/register";
+    private static final String LOGIN_ENDPOINT = PATH + "auth/login";
 
     @Autowired
     private MockMvc mockMvc;
@@ -57,6 +58,35 @@ class AuthSpecificationTest {
                         .content(getUserRequestJson()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isEmpty());
+    }
+
+    @Test
+    void shouldLoginUserAndReturnOkWithToken() throws Exception {
+        String username = "testUser";
+        String password = "testPassword";
+        String generatedToken = "mocked.jwt.token";
+
+        when(usersService.loginUser(username, password)).thenReturn(generatedToken);
+
+        mockMvc.perform(post(LOGIN_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(getUserRequestJson()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").value(generatedToken));
+    }
+
+    @Test
+    void shouldReturnUnauthorizedWhenLoginFails() throws Exception {
+        String username = "testUser";
+        String password = "testPassword";
+
+        when(usersService.loginUser(username, password))
+                .thenThrow(new org.springframework.security.authentication.BadCredentialsException("Bad credentials"));
+
+        mockMvc.perform(post(LOGIN_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(getUserRequestJson()))
+                .andExpect(status().isUnauthorized());
     }
 
     private String getUserRequestJson() throws JsonProcessingException {

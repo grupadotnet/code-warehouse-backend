@@ -20,6 +20,7 @@ import static pl.milosnicyit.codewarehousebackend.helpers.JsonHelper.toJson;
 @ActiveProfiles("test")
 class AuthControllerE2ETest {
     private static final String REGISTER_ENDPOINT = PATH + "auth/register";
+    private static final String LOGIN_ENDPOINT = PATH + "auth/login";
 
     @Autowired
     private MockMvc mockMvc;
@@ -54,6 +55,49 @@ class AuthControllerE2ETest {
                         .content(jsonRequest))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.error").isNotEmpty());
+    }
+
+    @Test
+    void shouldLoginSuccessfullyEndToEnd() throws Exception {
+        String username = "login_e2e_user";
+        String password = "securePassword123";
+
+        mockMvc.perform(post(REGISTER_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(getUserRequestJson(username, password)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post(LOGIN_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(getUserRequestJson(username, password)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").isNotEmpty());
+    }
+
+    @Test
+    void shouldFailLoginWhenPasswordIsIncorrectEndToEnd() throws Exception {
+        String username = "wrong_pass_user";
+        String password = "correctPassword";
+
+        mockMvc.perform(post(REGISTER_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(getUserRequestJson(username, password)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post(LOGIN_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(getUserRequestJson(username, "securePassword123")))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldFailLoginWhenUserDoesNotExistEndToEnd() throws Exception {
+        String unknownUser = "i_dont_exist_in_db";
+
+        mockMvc.perform(post(LOGIN_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(getUserRequestJson(unknownUser, "securePassword123")))
+                .andExpect(status().isNotFound());
     }
 
     private String getUserRequestJson(String username, String password) throws JsonProcessingException {
