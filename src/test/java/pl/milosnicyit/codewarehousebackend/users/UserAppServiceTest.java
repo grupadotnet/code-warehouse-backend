@@ -7,13 +7,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.milosnicyit.codewarehousebackend.exeptions.UserAlreadyExistsException;
 import pl.milosnicyit.codewarehousebackend.jwt.JWTService;
 import pl.milosnicyit.codewarehousebackend.password.PasswordEncoderService;
 import pl.milosnicyit.codewarehousebackend.users.database.wrapper.UserDTO;
 import pl.milosnicyit.codewarehousebackend.users.database.wrapper.UserRepositoryWrapper;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -33,15 +33,15 @@ class UserAppServiceTest {
     private UserAppService userAppService;
 
     @Test
-    void shouldReturnNullWhenUsernameIsAlreadyTaken() {
+    void shouldThrowExceptionWhenUsernameIsAlreadyTaken() {
         String username = "zajetyLogin";
         String rawPassword = "secretPassworddddddddddddddddddddddddddddddddddddd";
 
         when(userRepositoryWrapper.existsByUsername(username)).thenReturn(true);
-
-        String result = userAppService.registerUser(username, rawPassword);
-
-        assertNull(result, "Should return null if user already exists");
+        assertThrows(
+                UserAlreadyExistsException.class,
+                () -> userAppService.registerUser(username, rawPassword)
+        );
 
         verify(userRepositoryWrapper, never()).save(any());
         verify(jwtService, never()).generateToken(anyString());
