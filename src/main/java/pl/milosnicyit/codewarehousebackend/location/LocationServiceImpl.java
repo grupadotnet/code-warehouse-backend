@@ -1,6 +1,7 @@
 package pl.milosnicyit.codewarehousebackend.location;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LocationServiceImpl implements LocationService {
 
@@ -12,7 +13,9 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public List<Location> getAllLocations() {
-        return locationRepository.findAll();
+        return locationRepository.findAll().stream()
+                .filter(Location::isActive)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -33,6 +36,10 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public void deleteLocation(Long id) {
-        locationRepository.deleteById(id);
+        Location location = locationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Location not found"));
+
+        location.deactivate();
+        locationRepository.save(location);
     }
 }

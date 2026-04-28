@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -28,22 +29,26 @@ class LocationServiceSpecificationTest {
     }
 
     @Test
-    void shouldCreateLocationWhenNameIsUnique() {
-        Location location = new Location(1L, "Magazyn");
-        when(locationRepository.findByName("Magazyn")).thenReturn(Optional.empty());
-        when(locationRepository.save(any(Location.class))).thenReturn(location);
+    void shouldDeactivateLocationWhenEmpty() {
+        // given (empty = true)
+        Location location = new Location(1L, "Magazyn", true, true);
+        when(locationRepository.findById(1L)).thenReturn(Optional.of(location));
 
-        Location result = locationService.createLocation(location);
+        // when
+        locationService.deleteLocation(1L);
 
-        assertEquals("Magazyn", result.getName());
+        // then
+        assertFalse(location.isActive());
         verify(locationRepository).save(location);
     }
 
     @Test
-    void shouldThrowExceptionWhenLocationNameExists() {
-        Location location = new Location(1L, "Magazyn");
-        when(locationRepository.findByName("Magazyn")).thenReturn(Optional.of(location));
+    void shouldThrowExceptionWhenDeletingNonEmptyLocation() {
+        // given (empty = false)
+        Location location = new Location(1L, "Magazyn", true, false);
+        when(locationRepository.findById(1L)).thenReturn(Optional.of(location));
 
-        assertThrows(IllegalArgumentException.class, () -> locationService.createLocation(location));
+        // when / then
+        assertThrows(IllegalStateException.class, () -> locationService.deleteLocation(1L));
     }
 }

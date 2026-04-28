@@ -20,11 +20,22 @@ public class LocationEntity {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
+    @Column(nullable = false)
+    private boolean empty = true;
+
     public static LocationEntity fromDomain(Location location) {
-        return new LocationEntity(location.getId(), location.getName());
+        return new LocationEntity(
+                location.getId(),
+                location.getName(),
+                location.isActive(),
+                location.isEmpty()
+        );
     }
 
     public Location toDomain() {
-        return new Location(id, name);
+        return new Location(id, name, active, empty);
     }
 }

@@ -10,4 +10,20 @@ import lombok.NoArgsConstructor;
 public class Location {
     private Long id;
     private String name;
+    private boolean active = true;
+    private boolean empty = true;
+
+    public Location(Long id, String name) {
+        this.id = id;
+        this.name = name;
+        this.active = true;
+        this.empty = true;
+    }
+
+    void deactivate() {
+        if (!this.empty) {
+            throw new IllegalStateException("Cannot delete location: it is not empty");
+        }
+        this.active = false;
+    }
 }
